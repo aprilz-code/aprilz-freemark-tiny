@@ -61,9 +61,10 @@
                   <br />
                </div>
             </div>
-            <p class="bg-info " style="padding: 10px; font-size: 90%; ">1.先下载小米运动APP。使用手机号码注册，在APP中，在设置里找到第三方接入，绑定微信和支付宝（需要使用哪个就绑定哪个</p>
+            <p class="bg-info" style="padding: 10px; font-size: 90%; ">1.先下载小米运动APP。使用手机号码注册，在APP中，在设置里找到第三方接入，绑定微信和支付宝（需要使用哪个就绑定哪个</p>
             <p class="bg-warning" style="padding: 10px; font-size: 90%;">2.在本站提交手机号码和密码，以及步数，点击打卡按钮即可提交步数</p>
             <p class="bg-danger " style="padding: 10px; font-size: 90%; ">3.更多问题请点击网站上方的&quot;常见问题&quot;</p>
+            <p class="bg-primary" style="padding: 10px; font-size: 90%; ">需要每天定时代刷以及其他问题可以咨询微信:aprilz___ (tips:三个_)</p>
          </div>
       </div>
    </div>
@@ -83,7 +84,8 @@
             <br /> A:有影响，只要你刷的步数不过分（尽量别超过20000），一般不会被举报，即使举报封号，也是运动部分。
             <br /> Q:不起作用该怎么办？
             <br /> A:安装APP并登录账号后点击-我的-第三方接入-绑定至相关需要同步的第三方。
-            <br /> 还有其他问题可以咨询微信:aprilz___ (三个_)
+            <br /> ------------------------------------------------------------------
+            <br /> 需要每天定时代刷以及其他问题可以咨询微信:aprilz___ (三个_)
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">我知道了</button>
