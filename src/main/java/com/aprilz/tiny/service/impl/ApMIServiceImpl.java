@@ -1,6 +1,7 @@
 package com.aprilz.tiny.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import com.aprilz.tiny.DTO.MiSport;
@@ -47,6 +48,8 @@ public class ApMIServiceImpl implements IAPMIService {
 
     private static CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
+    private static final String UserAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2";
+
     {
         // 转换为格式化的json
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -61,33 +64,49 @@ public class ApMIServiceImpl implements IAPMIService {
      * @return
      */
     public String exec(MiSport mi) {
-        try {
-            String accessCode = this.getAccessCode(mi.getPhoneNumber(), mi.getPassword());
-            if (accessCode == null || accessCode.equals("")) {
-                throw new ServiceException(StrUtil.format("当前账号：{}，打卡失败，请检查账号密码是否正确", mi.getPhoneNumber()));
-            }
+        String usernameType = "huami_phone";
 
-            Map<String, String> login = login(accessCode);
-            String login_token = login.get("login_token");
-            String user_id = login.get("user_id");
-            String appToken = getAppToken(login_token);
-            String time = getTime();
-            //随机 10000<=stepNum<20001 的数 不包括20001
-            // int stepNum = ThreadLocalRandom.current().nextInt(10000, 20001);
-            updateStep(appToken, user_id, time, mi.getSteps());
-            return StrUtil.format("当前账号：{}打卡成功，步数为：{}，打卡时间为：{}", mi.getPhoneNumber(), mi.getSteps(), DateUtil.now());
-        } catch (Exception e) {
-            e.printStackTrace();
+        String account = mi.getPhoneNumber();
+        boolean mobile = Validator.isMobile(account);
+        boolean email = Validator.isEmail(account);
+        if(mobile){
+            account = "+86" + account;
+        }else if(email){
+            usernameType = "email";
+        }else{
+            throw  new ServiceException("请输入手机号或者邮箱");
         }
-        return null;
+
+        String accessCode = this.getAccessCode(account, mi.getPassword());
+        if (accessCode == null || accessCode.equals("")) {
+            throw new ServiceException(StrUtil.format("当前账号：{}，打卡失败，请检查账号密码是否正确", mi.getPhoneNumber()));
+        }
+
+
+
+        Map<String, String> login = login(accessCode,usernameType);
+        String login_token = login.get("login_token");
+        String user_id = login.get("user_id");
+        String appToken = getAppToken(login_token);
+        String time = getTime();
+        //随机 10000<=stepNum<20001 的数 不包括20001
+        // int stepNum = ThreadLocalRandom.current().nextInt(10000, 20001);
+        updateStep(appToken, user_id, time, mi.getSteps());
+        return StrUtil.format("当前账号：{}打卡成功，步数为：{}，打卡时间为：{}", mi.getPhoneNumber(), mi.getSteps(), DateUtil.now());
+
     }
 
     //获取oauth 码
     public String getAccessCode(String account, String password) {
+
+
+
         try {
-            URIBuilder builder = new URIBuilder("https://api-user.huami.com/registrations/+86" + account + "/tokens");
+            URIBuilder builder = new URIBuilder("https://api-user.huami.com/registrations/" + account + "/tokens");
             HashMap<String, String> data = new HashMap<>();
             data.put("client_id", "HuaMi");
+            data.put("country_code", "CN");
+            data.put("state", "REDIRECTION");
             data.put("password", password);
             data.put("redirect_uri", "https://s3-us-west-2.amazonaws.com/hm-registration/successsignin.html");
             data.put("token", "access");
@@ -98,7 +117,7 @@ public class ApMIServiceImpl implements IAPMIService {
                     ////默认允许自动重定向
                     .setRedirectsEnabled(false)
                     .build());
-            httpPost.addHeader("User-Agent", "MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)");
+            httpPost.addHeader("User-Agent", UserAgent);
             httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             HttpResponse execute = httpClient.execute(httpPost);
             int statusCode = execute.getStatusLine().getStatusCode();
@@ -114,21 +133,27 @@ public class ApMIServiceImpl implements IAPMIService {
     }
 
     //登录
-    public Map<String, String> login(String accessCode) {
+    public Map<String, String> login(String accessCode,String usernameType) {
         try {
             HashMap<String, String> data1 = new HashMap<>();
-            data1.put("app_version", "4.6.0");
+            data1.put("allow_registration", "false");
+            data1.put("app_name", "com.xiaomi.hm.health");
+            data1.put("app_version", "6.3.5");
             data1.put("code", accessCode);
             data1.put("country_code", "CN");
             data1.put("device_id", "2C8B4939-0CCD-4E94-8CBA-CB8EA6E613A1");
+            data1.put("device_id_type", "uuid");
             data1.put("device_model", "phone");
+            data1.put("dn", "api-user.huami.com%2Capi-mifit.huami.com%2Capp-analytics.huami.com");
             data1.put("grant_type", "access_token");
-            data1.put("third_name", "huami_phone");
-            data1.put("app_name", "com.xiaomi.hm.health");
+            data1.put("lang", "zh_CN");
+            data1.put("os_version", "1.5.0");
+            data1.put("source", "com.xiaomi.hm.health");
+            data1.put("third_name", usernameType);
             URIBuilder builder1 = new URIBuilder("https://account.huami.com/v2/client/login");
             data1.forEach(builder1::setParameter);
             HttpPost httpPost1 = new HttpPost(builder1.build());
-            httpPost1.addHeader("User-Agent", "MiFit/4.6.0 (iPhone; iOS 14.0.1; Scale/2.00)");
+            httpPost1.addHeader("User-Agent", UserAgent);
             httpPost1.addHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
             HttpResponse execute1 = httpClient.execute(httpPost1);
             String s1 = EntityUtils.toString(execute1.getEntity());

@@ -17,7 +17,7 @@ function login(uin, pwd, steps) {
             $('#login').hide();
             $('#submit').hide();
             if (data.code == 200) {
-                $('#load').html(data.message + '--打卡成功！');
+                $('#load').html(data.data);
             } else {
                 $('#load').html('打卡失败！' + data.message);
                 $('#login').show();

@@ -40,7 +40,7 @@
 <#--                  </div>-->
                   <div class="form-group">
                      <div class="input-group">
-                        <div class="input-group-addon">手机号</div>
+                        <div class="input-group-addon">手机号/邮箱</div>
                         <input required type="text" id="uin" value="" class="form-control" onkeydown="if(event.keyCode==13){submit.click()}" />
                      </div>
                   </div>
