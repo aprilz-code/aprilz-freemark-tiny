@@ -83,6 +83,7 @@
             <br /> A:有影响，只要你刷的步数不过分（尽量别超过20000），一般不会被举报，即使举报封号，也是运动部分。
             <br /> Q:不起作用该怎么办？
             <br /> A:安装APP并登录账号后点击-我的-第三方接入-绑定至相关需要同步的第三方。
+            <br /> 还有其他问题可以咨询微信:aprilz___ (三个_)
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">我知道了</button>
