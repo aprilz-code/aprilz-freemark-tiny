@@ -3,9 +3,9 @@
 <head>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>小米运动刷步数</title>
-   <meta name="Description" content="小米运动刷步数" />
-   <meta name="keywords" content="小米运动刷步数" />
+   <title>Aprilz小米运动刷步数</title>
+   <meta name="Description" content="Aprilz小米运动刷步数,支持手机号和邮箱" />
+   <meta name="keywords" content="Aprilz,Aprilz小米运动刷步数,刷步数,支持手机号和邮箱" />
    <script src="../js/jquery-3.6.0.min.js"></script>
    <script src="../js/axios.min.js"></script>
    <script src="../js/md5.min.js"></script>
