@@ -34,75 +34,15 @@ public class ApUseInfo extends Model<ApUseInfo> {
     private Long id;
 
     /**
-     * 用户名
-     */
-    private String username;
-
-    /**
      * 手机号码
      */
-    private String phone;
+    private String mobile;
 
     /**
-     * 银行卡号
+     *  密码
      */
-    private String bankCard;
+    private String pwd;
 
-    /**
-     * 开户行
-     */
-    private String openBank;
-
-    /**
-     * 单位名称
-     */
-    private String companyName;
-
-    /**
-     * 工作地址
-     */
-    private String workPlace;
-
-    /**
-     * 居住地
-     */
-    private String address;
-
-    /**
-     * 总额度
-     */
-    private BigDecimal totalAmount;
-
-    /**
-     * 有车：0->没有；1->有
-     */
-    private Integer hasCar;
-
-    /**
-     * 有公积金：0->没有；1->有
-     */
-    @TableField("has_RESERVED_FUNDS")
-    private Integer hasReservedFunds;
-
-    /**
-     * 有保单：0->没有；1->有
-     */
-    private Integer hasChit;
-
-    /**
-     * 身份证正面
-     */
-    private String front;
-
-    /**
-     * 身份证背面
-     */
-    private String behind;
-
-    /**
-     *  关联人ID
-     */
-    private Long relationId;
 
 
     @Override

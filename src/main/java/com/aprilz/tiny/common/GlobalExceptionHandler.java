@@ -18,14 +18,6 @@ import javax.validation.UnexpectedTypeException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ResponseBody
-    @ExceptionHandler(value = ApiException.class)
-    public CommonResult handle(ApiException e) {
-        if (e.getErrorCode() != null) {
-            return CommonResult.failed(e.getErrorCode());
-        }
-        return CommonResult.failed(e.getMessage());
-    }
 
     @ResponseBody
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -56,16 +48,16 @@ public class GlobalExceptionHandler {
     }
 
 
-
     /**
      * 数据类型校验异常
+     *
      * @param e
      * @return
      */
     @ExceptionHandler(value = UnexpectedTypeException.class)
     public CommonResult unexpectedTypeException(UnexpectedTypeException e) {
         if (e.getMessage() != null) {
-            return CommonResult.failed(e.getMessage());
+            return CommonResult.error(e.getMessage());
         }
         return CommonResult.validateFailed(e.getMessage());
 
