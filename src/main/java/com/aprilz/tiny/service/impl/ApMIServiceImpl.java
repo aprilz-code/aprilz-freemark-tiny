@@ -1,10 +1,10 @@
 package com.aprilz.tiny.service.impl;
 
-import ch.qos.logback.core.util.TimeUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
 import com.aprilz.tiny.DTO.MiSport;
+import com.aprilz.tiny.config.ServiceException;
 import com.aprilz.tiny.service.IAPMIService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,15 +24,12 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.rmi.ServerException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * <p>
@@ -59,33 +56,34 @@ public class ApMIServiceImpl implements IAPMIService {
 
     /**
      * 执行打卡
+     *
      * @param
      * @return
      */
-    public  String exec(MiSport mi) {
-            try {
-                String accessCode = this.getAccessCode(mi.getPhoneNumber(), mi.getPassword());
-                if (accessCode == null || accessCode.equals("")) {
-                    return  StrUtil.format("当前账号：{}，打卡失败，请检查账号密码是否正确",mi.getPhoneNumber());
-                }
-
-                Map<String, String> login = login(accessCode);
-                String login_token = login.get("login_token");
-                String user_id = login.get("user_id");
-                String appToken = getAppToken(login_token);
-                String time = getTime();
-                //随机 10000<=stepNum<20001 的数 不包括20001
-               // int stepNum = ThreadLocalRandom.current().nextInt(10000, 20001);
-                updateStep(appToken, user_id, time, mi.getSteps());
-                return  StrUtil.format("当前账号：{}打卡成功，步数为：{}，打卡时间为：{}", mi.getPhoneNumber(),mi.getSteps(), DateUtil.now());
-            } catch (Exception e) {
-                e.printStackTrace();
+    public String exec(MiSport mi) {
+        try {
+            String accessCode = this.getAccessCode(mi.getPhoneNumber(), mi.getPassword());
+            if (accessCode == null || accessCode.equals("")) {
+                throw new ServiceException(StrUtil.format("当前账号：{}，打卡失败，请检查账号密码是否正确", mi.getPhoneNumber()));
             }
-            return null;
+
+            Map<String, String> login = login(accessCode);
+            String login_token = login.get("login_token");
+            String user_id = login.get("user_id");
+            String appToken = getAppToken(login_token);
+            String time = getTime();
+            //随机 10000<=stepNum<20001 的数 不包括20001
+            // int stepNum = ThreadLocalRandom.current().nextInt(10000, 20001);
+            updateStep(appToken, user_id, time, mi.getSteps());
+            return StrUtil.format("当前账号：{}打卡成功，步数为：{}，打卡时间为：{}", mi.getPhoneNumber(), mi.getSteps(), DateUtil.now());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     //获取oauth 码
-    public  String getAccessCode(String account, String password) {
+    public String getAccessCode(String account, String password) {
         try {
             URIBuilder builder = new URIBuilder("https://api-user.huami.com/registrations/+86" + account + "/tokens");
             HashMap<String, String> data = new HashMap<>();
@@ -116,7 +114,7 @@ public class ApMIServiceImpl implements IAPMIService {
     }
 
     //登录
-    public  Map<String, String> login(String accessCode) {
+    public Map<String, String> login(String accessCode) {
         try {
             HashMap<String, String> data1 = new HashMap<>();
             data1.put("app_version", "4.6.0");
@@ -147,7 +145,7 @@ public class ApMIServiceImpl implements IAPMIService {
         return null;
     }
 
-    public  String getAppToken(String login_token) {
+    public String getAppToken(String login_token) {
         try {
             HttpGet httpGet = new HttpGet("https://account-cn.huami.com/v1/client/app_tokens?app_name=com.xiaomi.hm.health&dn=api-user.huami.com%2Capi-mifit.huami.com%2Capp-analytics.huami.com&login_token=" + login_token);
             httpGet.addHeader("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 9; MI 6 MIUI/20.6.18)");
@@ -161,7 +159,7 @@ public class ApMIServiceImpl implements IAPMIService {
         return null;
     }
 
-    public  String getTime() {
+    public String getTime() {
         try {
             HttpGet httpGet = new HttpGet("http://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp");
             httpGet.addHeader("User-Agent", "Dalvik/2.1.0 (Linux; U; Android 9; MI 6 MIUI/20.6.18)");
@@ -176,7 +174,7 @@ public class ApMIServiceImpl implements IAPMIService {
         return null;
     }
 
-    private  void updateStep(String appToken, String userId, String time, Integer step) {
+    private void updateStep(String appToken, String userId, String time, Integer step) {
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String format = simpleDateFormat.format(date);

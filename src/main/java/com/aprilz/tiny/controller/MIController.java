@@ -1,6 +1,7 @@
 package com.aprilz.tiny.controller;
 
 import com.aprilz.tiny.DTO.MiSport;
+import com.aprilz.tiny.common.api.CommonResult;
 import com.aprilz.tiny.entity.ApUseInfo;
 import com.aprilz.tiny.service.IAPMIService;
 import com.aprilz.tiny.service.IApUseInfoService;
@@ -33,13 +34,14 @@ public class MIController {
 
     @PostMapping({"/exec"})
     @ResponseBody
-    public String exec(@RequestBody MiSport miSport) {
+    public CommonResult<String> exec(@RequestBody MiSport miSport) {
         try {
             ApUseInfo user = new ApUseInfo();
             user.setMobile(miSport.getPhoneNumber());
             iApUseInfoService.save(user);
         } catch (Exception e) {
         }
-        return iapmiService.exec(miSport);
+        String exec = iapmiService.exec(miSport);
+        return CommonResult.success(exec);
     }
 }
